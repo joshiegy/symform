@@ -1,34 +1,17 @@
 FROM centos
+MAINTAINER Joshi Friberg
 
-COPY ./CrashPlan_4.5.0_Linux.tgz /CrashPlan_4.5.0_Linux.tgz
+WORKDIR /opt
+COPY ./Symform.rpm Symform.rpm
+# Custom startupscript
+COPY ./entrypoint.sh entrypoint.sh
+RUN yum install -y cronie
+RUN yum localinstall -y Symform.rpm
 
-RUN yum -y update
-RUN yum -y install \
-grep \
-sed \
-cpio \
-gzip \
-coreutils \
-which
+# Setup webgui
+EXPOSE 59234/tcp 42666/tcp
 
-RUN tar xpzf /CrashPlan_4.5.0_Linux.tgz -C /opt/ && rm -rf /CrashPlan_4.5.0_Linux.tgz
+RUN rm -rf Symform.rpm
+RUN chmod a+x ./entrypoint.sh
 
-COPY ./custom-install.sh /opt/crashplan-install/install.sh
-RUN mkdir -p /crashplan
-
-WORKDIR /opt/crashplan-install
-RUN bash ./install.sh
-RUN rm -rf /opt/crashplan-install
-
-EXPOSE 4242/tcp 4243/tcp
-
-WORKDIR /crashplan/crashplan
-run sed -i 's/nice\ -n\ 19\ \$JAVACOMMON\ \$SRV_JAVA_OPTS\ -classpath\ \$FULL_CP\ com\.backup42\.service\.CPService.*/nice -n 19 $JAVACOMMON $SRV_JAVA_OPTS -classpath $FULL_CP com.backup42.service.CPService/' bin/CrashPlanEngine
-
-RUN for app in cpio curl python passwd tar diff sdiff hostname; do chmod 444 $(which $app); done
-
-COPY ./linker.sh /crashplan/linker.sh
-COPY ./entrypoint.sh /crashplan/entrypoint.sh
-RUN chmod a+x /crashplan/linker.sh /crashplan/entrypoint.sh
-
-ENTRYPOINT /crashplan/entrypoint.sh
+ENTRYPOINT ./entrypoint.sh
