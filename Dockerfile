@@ -1,5 +1,8 @@
-FROM centos
+FROM centos:7
 MAINTAINER Joshi Friberg
+
+RUN mkdir /data
+VOLUME ["/data"]
 
 WORKDIR /opt
 COPY ./Symform.rpm Symform.rpm
