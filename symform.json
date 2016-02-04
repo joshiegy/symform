@@ -1,12 +1,12 @@
 {
     "Symform": {
-        "description": "Joshis Symform container",
+        "description": "Symform backupservice",
         "more_info": "<h4>Symform syncservice - containerized by Joshiegy for Rockstor</h4>",
         "version": "one point oh",
         "website": "http://www.symform.com/",
         "volume_add_support": true,
         "containers": {
-            "Symform": {
+            "symform": {
                 "image": "joshiegy/symform",
                 "launch_order": 1,
                 "ports": {
